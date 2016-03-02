@@ -1,0 +1,3 @@
+﻿IF EXISTS (SELECT name FROM	sys.databases WHERE name = N'IbeeConer')
+DROP DATABASE [IbeeConer]
+CREATE DATABASE [IbeeConer]

@@ -1,0 +1,373 @@
+﻿USE [IbeeConer]
+
+CREATE TABLE [dbo].[KhachHang](
+	[MaKH] [nvarchar](50) NOT NULL,
+	[TenKH] [nvarchar](100) NULL,
+	[DienThoai] [nvarchar](100) NULL,
+	[DiaChi] [nvarchar](100) NULL,
+	[GhiChu] [nvarchar](100) NULL,
+ CONSTRAINT [PK_KhachHang_1] PRIMARY KEY CLUSTERED 
+(
+	[MaKH] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[LoaiSanPham](
+	[MaLSP] [nvarchar](50) NOT NULL,
+	[TenLSP] [nvarchar](100) NULL,
+	[MoTa] [nvarchar](100) NULL,
+ CONSTRAINT [PK_LoaiSanPham] PRIMARY KEY CLUSTERED 
+(
+	[MaLSP] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[SanPham](
+	[MaSP] [nvarchar](50) NOT NULL,
+	[TenSP] [nvarchar](100) NULL,
+	[LinkSP] [nvarchar](max) NULL,
+	[NhanDanTe] [money] NULL,
+	[VietNamDong] [money] NULL,
+	[MaLSP] [nvarchar](50) NULL,
+	[SoLuong] [int] NULL,
+	[GhiChu] [nvarchar](100) NULL,
+	[HinhAnh] [image] NULL,
+ CONSTRAINT [PK_SanPham] PRIMARY KEY CLUSTERED 
+(
+	[MaSP] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+CREATE TABLE [dbo].[DonHang](
+	[MaDonHang] [nvarchar](50) NOT NULL,
+	[DotHang] [int] NULL,
+	[Thang] [int] NULL,
+	[Nam] [int] NULL,
+	[NgayLap] [datetime] NULL,
+	[TongGiaTri] [money] NULL,
+	[TienLai] [money] NULL,
+ CONSTRAINT [PK_DonHang] PRIMARY KEY CLUSTERED 
+(
+	[MaDonHang] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[CTDH](
+	[MaCTDH] [nvarchar](50) NOT NULL,
+	[MaDonHang] [nvarchar](50) NULL,
+	[MaKH] [nvarchar](50) NULL,
+	[MaSP] [nvarchar](50) NULL,
+	[SoLuongMua] [int] NULL,
+	[DonGiaNhap] [money] NULL,
+	[TienLoi] [money] NULL,
+	[DonGiaBan] [money] NULL,
+ CONSTRAINT [PK_CTDH] PRIMARY KEY CLUSTERED 
+(
+	[MaCTDH] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+ALTER TABLE [dbo].[CTDH]  WITH CHECK ADD  CONSTRAINT [FK_CTDH_DonHang] FOREIGN KEY([MaDonHang])
+REFERENCES [dbo].[DonHang] ([MaDonHang])
+
+ALTER TABLE [dbo].[CTDH] CHECK CONSTRAINT [FK_CTDH_DonHang]
+
+ALTER TABLE [dbo].[CTDH]  WITH CHECK ADD  CONSTRAINT [FK_CTDH_KhachHang] FOREIGN KEY([MaKH])
+REFERENCES [dbo].[KhachHang] ([MaKH])
+
+ALTER TABLE [dbo].[CTDH] CHECK CONSTRAINT [FK_CTDH_KhachHang]
+
+ALTER TABLE [dbo].[CTDH]  WITH CHECK ADD  CONSTRAINT [FK_CTDH_SanPham] FOREIGN KEY([MaSP])
+REFERENCES [dbo].[SanPham] ([MaSP])
+
+ALTER TABLE [dbo].[CTDH] CHECK CONSTRAINT [FK_CTDH_SanPham]
+
+ALTER TABLE [dbo].[SanPham]  WITH CHECK ADD  CONSTRAINT [FK_SanPham_LoaiSanPham] FOREIGN KEY([MaLSP])
+
+ALTER TABLE [dbo].[SanPham] CHECK CONSTRAINT [FK_SanPham_LoaiSanPham]
+
+CREATE PROC [dbo].[sp_CTDH_Delete]	
+@MaCTDH NVARCHAR(50)
+AS
+BEGIN
+	DELETE FROM CTDH WHERE MaCTDH  = @MaCTDH
+END
+
+CREATE PROC [dbo].[sp_CTDH_Delete_ByMaDH]	
+@MaDonHang NVARCHAR(50)
+AS
+BEGIN
+	DELETE FROM CTDH WHERE MaDonHang  = @MaDonHang
+END
+
+CREATE PROC [dbo].[sp_CTDH_Insert] 
+@MaCTDH NVARCHAR(50),
+@MaDonHang NVARCHAR(50),
+@MaKH NVARCHAR(50),
+@MaSP NVARCHAR(50),
+@SoLuongMua INT,
+@DonGiaNhap MONEY,
+@TienLoi MONEY,
+@DonGiaBan MONEY
+AS
+BEGIN
+	INSERT INTO CTDH(MaCTDH,MaDonHang, MaKH, MaSP, SoLuongMua, DonGiaNhap, TienLoi,
+	            DonGiaBan)	VALUES(@MaCTDH,@MaDonHang,@MaKH,@MaSP,@SoLuongMua,@DonGiaNhap,@TienLoi,@DonGiaBan)
+END
+
+CREATE PROC [dbo].[sp_CTDH_Select_All]
+AS
+BEGIN
+	SELECT * FROM CTDH
+END
+
+CREATE PROC [dbo].[sp_CTDH_Select_ByID]
+@MaCTDH NVARCHAR(50)
+AS
+BEGIN
+	SELECT * FROM CTDH WHERE MaCTDH  = @MaCTDH
+END
+
+CREATE PROC [dbo].[sp_CTDH_Select_ByMaDH]
+@MaDonHang NVARCHAR(50)
+AS
+BEGIN
+	SELECT * FROM CTDH WHERE MaDonHang  = @MaDonHang
+END
+
+CREATE PROC [dbo].[sp_CTDH_Select_ByMaDonHang]
+@MaDonHang NVARCHAR(50),
+@MaKH NVARCHAR(50)
+AS
+BEGIN
+	SELECT MaKH, MaSP, SoLuongMua,DonGiaBan FROM CTDH WHERE MaKH = @MaKH AND MaDonHang = @MaDonHang
+END
+
+CREATE PROC [dbo].[sp_CTDH_TinhTien]
+@MaDonHang NVARCHAR(50),
+@MaKH NVARCHAR(50)
+AS
+BEGIN
+	SELECT MaKH,SUM(DonGiaBan)AS TongTien
+  FROM CTDH WHERE MaKH = @MaKH AND MaDonHang = @MaDonHang GROUP BY MaKH
+END
+
+CREATE PROC [dbo].[sp_CTDH_Update]
+@MaCTDH NVARCHAR(50),
+@MaDonHang NVARCHAR(50),
+@MaKH NVARCHAR(50),
+@MaSP NVARCHAR(50),
+@SoLuongMua INT,
+@DonGiaNhap MONEY,
+@TienLoi MONEY,
+@DonGiaBan MONEY
+AS
+BEGIN
+	UPDATE CTDH SET  MaDonHang = @MaDonHang,
+	             MaSP = @MaSP,
+	             MaKH = @MaKH,
+	             SoLuongMua = @SoLuongMua,
+	             DonGiaNhap = @DonGiaNhap,
+	             TienLoi = @TienLoi,
+	             DonGiaBan = @DonGiaBan WHERE MaCTDH  = @MaCTDH
+END
+
+CREATE PROC [dbo].[sp_DonHang_Delete]	
+@MaDonHang NVARCHAR(50)
+AS
+BEGIN
+	DELETE FROM DonHang WHERE MaDonHang = @MaDonHang
+END
+
+CREATE PROC [dbo].[sp_DonHang_Insert] 
+@MaDonHang NVARCHAR(50),
+@DotHang INT,
+@Thang INT,
+@Nam INT,
+@NgayLap DATETIME,
+@TongGiaTri MONEY,
+@TienLai MONEY
+AS
+BEGIN
+	INSERT INTO DonHang(MaDonHang,DotHang,Thang,Nam,NgayLap,TongGiaTri,TienLai)	VALUES(	@MaDonHang,@DotHang,@Thang,@Nam,@NgayLap,@TongGiaTri,@TienLai)
+END
+
+CREATE PROC [dbo].[sp_DonHang_Select_All]
+AS
+BEGIN
+	SELECT * FROM DonHang
+END
+
+CREATE PROC [dbo].[sp_DonHang_Select_ByID]
+@MaDonHang NVARCHAR(50)
+AS
+BEGIN
+	SELECT * FROM DonHang WHERE MaDonHang = @MaDonHang
+END
+
+CREATE PROC [dbo].[sp_DonHang_Update]
+@MaDonHang NVARCHAR(50),
+@DotHang INT,
+@Thang INT,
+@Nam INT,
+@NgayLap DATETIME,
+@TongGiaTri MONEY,
+@TienLai MONEY
+AS
+BEGIN
+	UPDATE DonHang SET  DotHang = @DotHang,
+	                Thang = @Thang,
+	                Nam = @Nam,
+	                NgayLap = @NgayLap,
+	                TongGiaTri = @TongGiaTri,
+	                TienLai = @TienLai WHERE MaDonHang  = @MaDonHang
+END
+
+CREATE PROC [dbo].[sp_KhachHang_Delete]	
+@MaKH NVARCHAR(50)
+AS
+BEGIN
+	DELETE FROM KhachHang WHERE MaKH = @MaKH
+END
+
+CREATE PROC [dbo].[sp_KhachHang_Insert] 
+@MaKH NVARCHAR(50),
+@TenKH NVARCHAR(100),
+@DienThoai NVARCHAR(100),
+@DiaChi NVARCHAR(100),
+@GhiChu NVARCHAR(100)
+AS
+BEGIN
+	INSERT INTO KhachHang(MaKH,TenKH,DienThoai,DiaChi,GhiChu)	VALUES(	@MaKH,@TenKH,@DienThoai,@DiaChi,@GhiChu)
+END
+
+CREATE PROC [dbo].[sp_KhachHang_Select_All]
+AS
+BEGIN
+	SELECT * FROM KhachHang
+END
+
+CREATE PROC [dbo].[sp_KhachHang_Select_ByID]
+@MaKh NVARCHAR(50)
+AS
+BEGIN
+	SELECT * FROM KhachHang WHERE MaKH = @MaKH
+END
+
+CREATE PROC [dbo].[sp_KhachHang_Update]
+@MaKH NVARCHAR(50),
+@TenKH NVARCHAR(100),
+@DienThoai NVARCHAR(100),
+@DiaChi NVARCHAR(100),
+@GhiChu NVARCHAR(100)
+AS
+BEGIN
+	UPDATE KhachHang SET TenKH = @TenKH, DienThoai = @DienThoai, DiaChi = @DiaChi,GhiChu = @GhiChu WHERE MaKH = @MaKH
+END
+
+CREATE PROC [dbo].[sp_LoaiSanPham_Delete]	
+@MaLSP NVARCHAR(50)
+AS
+BEGIN
+	DELETE FROM LoaiSanPham WHERE MaLSP = @MaLSP
+END
+
+CREATE PROC [dbo].[sp_LoaiSanPham_Insert] 
+@MaLSP NVARCHAR(50),
+@TenLSP NVARCHAR(100),
+@MoTa NVARCHAR(100)
+AS
+BEGIN
+	INSERT INTO LoaiSanPham(MaLSP,TenLSP,MoTa)	VALUES(	@MaLSP,@TenLSP,@MoTa)
+END
+
+CREATE PROC [dbo].[sp_LoaiSanPham_Select_All]
+AS
+BEGIN
+	SELECT * FROM LoaiSanPham
+END
+
+CREATE PROC [dbo].[sp_LoaiSanPham_Select_ByID]
+@MaLSP NVARCHAR(50)
+AS
+BEGIN
+	SELECT * FROM LoaiSanPham WHERE MaLSP = @MaLSP
+END
+
+CREATE PROC [dbo].[sp_LoaiSanPham_Update]
+@MaLSP NVARCHAR(50),
+@TenLSP NVARCHAR(100),
+@MoTa NVARCHAR(100)
+AS
+BEGIN
+	UPDATE LoaiSanPham SET TenLSP = @TenLSP, MoTa = @MoTa WHERE MaLSP = @MaLSP
+END
+
+CREATE PROC [dbo].[sp_SanPham_Delete]	
+@MaSP NVARCHAR(50)
+AS
+BEGIN
+	DELETE FROM SanPham WHERE MaSP = @MaSP
+END
+
+CREATE PROC [dbo].[sp_SanPham_Insert] 
+@MaSP NVARCHAR(50),
+@TenSP NVARCHAR(100),
+@LinkSP NVARCHAR(MAX),
+@NhanDanTe MONEY,
+@VietNamDong MONEY,
+@MaLSP NVARCHAR(50),
+@SoLuong INT,
+@GhiChu NVARCHAR(100),
+@HinhAnh IMAGE
+AS
+BEGIN
+	INSERT INTO SanPham(MaSP,TenSP,LinkSP,NhanDanTe,VietNamDong,MaLSP,SoLuong,GhiChu,HinhAnh)	VALUES(	@MaSP,@TenSP,@LinkSP,@NhanDanTe,@VietNamDong,@MaLSP,@SoLuong,@GhiChu,@HinhAnh)
+END
+
+CREATE PROC [dbo].[sp_SanPham_Select_All]
+AS
+BEGIN
+	SELECT * FROM SanPham
+END
+
+CREATE PROC [dbo].[sp_SanPham_Select_ByID]
+@MaSP NVARCHAR(50)
+AS
+BEGIN
+	SELECT * FROM SanPham WHERE MaSP = @MaSP
+END
+
+CREATE PROC [dbo].[sp_SanPham_Select_BySoLuong]
+AS
+BEGIN
+	SELECT * FROM SanPham WHERE SoLuong>0
+END
+
+CREATE PROC [dbo].[sp_SanPham_Update]
+@MaSP NVARCHAR(50),
+@TenSP NVARCHAR(100),
+@LinkSP NVARCHAR(MAX),
+@NhanDanTe MONEY,
+@VietNamDong MONEY,
+@MaLSP NVARCHAR(50),
+@SoLuong INT,
+@GhiChu NVARCHAR(100),
+@HinhAnh IMAGE
+AS
+BEGIN
+	UPDATE SanPham SET TenSP = @TenSP, LinkSP = @LinkSP,NhanDanTe =@NhanDanTe ,VietNamDong = @VietNamDong,MaLSP = @MaLSP,SoLuong = @SoLuong,GhiChu = @GhiChu,HinhAnh = @HinhAnh WHERE MaSP = @MaSP
+END
+
+CREATE PROC [dbo].[sp_SanPham_Update_BySoLuong]
+@MaSP NVARCHAR(50),
+@SoLuong int
+AS
+BEGIN
+	UPDATE SanPham
+	SET
+	    SoLuong = @SoLuong WHERE MaSP = @MaSP
+END
+
+USE [master]
+ALTER DATABASE [IbeeConer] SET  READ_WRITE 
